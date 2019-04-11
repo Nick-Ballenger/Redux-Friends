@@ -1,49 +1,20 @@
-import axios from "axios";
-export const FRIENDSFETCHED = "FRIENDSFETCHED";
-export const FETCHINGFRIENDS = "FETCHINGFRIENDS";
-export const FRIENDSSAVED = "FRIENDSSAVED";
-export const SAVINGFRIENDS = "SAVINGFRIENDS";
-export const UPDATINGFRIEND = "UPDATINGFRIEND";
-export const FRIENDUPDATED = "FRIENDUPDATED";
-export const DELETINGFRIEND = "DELETINGFRIEND";
-export const FRIENDDELETED = "FRIENDDELETED";
+import React from "react";
+import ReactDOM from "react-dom";
 
-const URL = "http://localhost:5000/api/friends";
+import { Provider } from "react-redux";
+import { createStore, applyMiddleware } from "redux";
+import thunk from "redux-thunk";
+import logger from "redux-logger";
+import rootReducer from "./reducers";
 
-export const fetchData = () => dispatch => {
-  console.log("action call, GET");
-  dispatch({ type: FETCHINGFRIENDS });
-  axios
-    .get(URL)
-    .then(response => {
-      console.log(response);
-      dispatch({ type: FRIENDSFETCHED, payload: response.data });
-    })
-    .catch(err => err);
-};
+import "./index.css";
+import App from "./App";
 
-export const addFriend = newFriend => dispatch => {
-  console.log("action call, POST");
-  dispatch({ type: SAVINGFRIENDS });
-  axios
-    .post(URL, newFriend)
-    .then(response => {
-      console.log("ADD FRD", response);
-      dispatch({ type: FRIENDSSAVED, payload: response.data });
-    })
-    .catch(err => ({ err }));
-};
+const store = createStore(rootReducer, applyMiddleware(thunk, logger));
 
-export const deleteFriend = id => dispatch => {
-  console.log("action call, DELETE");
-  dispatch({ type: DELETINGFRIEND });
-  axios
-    .delete(`${URL}/${id}`)
-    .then(response => {
-      console.log("DELETED FRIEND");
-      dispatch({ type: FRIENDDELETED, payload: response.data });
-    })
-    .catch(err => {
-      dispatch({ err });
-    });
-};
+ReactDOM.render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById("root")
+);
